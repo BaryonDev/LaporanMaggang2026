@@ -1,196 +1,195 @@
-# Laporan Magang Harian Detil: Pengembangan Sistem Absensi Anti-Spoofing Terintegrasi BKNOA
+# Laporan Harian Magang: Pengembangan Sistem Absensi Terintegrasi BKNOA
 **Periode Magang**: 3 Februari 2026 – 1 April 2026
 
-Laporan ini mendokumentasikan progres teknikal harian secara komprehensif atas pengembangan sistem absensi berbasis kecerdasan buatan (*Face Anti-Spoofing*). Selama masa pengembangan, platform mengalami iterasi teknologi yang sangat dinamis untuk menambal kerentanan keamanan identitas wajah maupun celah pemalsuan berbasis koordinat *mock location*. 
+Laporan ini mendokumentasikan progres harian pengembangan sistem absensi berbasis kecerdasan buatan (*Face Anti-Spoofing*) dan validasi lokasi (*Geofencing*). Selama masa pengerjaan, sistem terbagi menjadi beberapa bagian: Admin Panel, Backend API, Face API, Aplikasi Mobile (Flutter), dan Progressive Web App (PWA).
 
-Berikut adalah rincian fungsionalitas harian yang diurutkan rapi berdasarkan log penyelesaian hari kerja:
-
----
-
-## FASE 1: Inisialisasi dan Pengembangan Dasbor Admin Laravel
-
-### 3 Februari 2026 (Selasa)
-**Kegiatan:** Setup environment sistem, instalasi base Laravel, dan perancangan skema database dasar untuk aplikasi Dasbor Admin.
-**Fokus Teknis:** Pengembangan hari pertama difokuskan dengan merakit framework sistem *back-office* Laravel melalui sinkronisasi utilitas Composer (`composer create-project laravel/laravel`). Pembuatan relasi tabel di-desain di level MySQL dengan nama file dasar migrasi arsitektur `antispoof_attendance.sql`. Tabel ini digagas untuk menopang pilar entitas arsitektur seperti `users`, `departments`, `events`, `venues` dan fungsionalitas dasar log presensi `attendances`.
-
-### 4 Februari 2026 (Rabu)
-**Kegiatan:** Slicing layout UI Dasbor Admin Panel sekaligus melengkapi sistem autentikasi form login pengguna dan setup perbandingan Role Access.
-**Fokus Teknis:** Slicing UI interaktif dieksekusi mematuhi arahan kerangka *Blade Templating* diiringi injeksi *Tailwind CSS*. Sistem form *login* direkayasa ketat memodifikasi basis fungsi kontrol bawaan `Auth::attempt`. Hak akses fungsional (`role_enum`) disaring berjenjang melalui fungsi penguncian rute `Middleware` guna memisah wewenang visibilitas sistem berlapis bagi User pengguna biasa, delegasi Admin, atau arsitek mutlak Superadmin.
-
-### 5 Februari 2026 (Kamis)
-**Kegiatan:** Penyelesaian UI antarmuka manajemen inti Master Data Pegawai spesifik departemen dan kontrol hierarki pada Admin Panel.
-**Fokus Teknis:** Dibangun wadah antarmuka pengolahan alur entri data (*Create, Read, Update, Delete* / CRUD) spesial guna menampung susunan bagan Data Pegawai administratif. Logika fungsional relasional tipe bersyarat *One-to-Many* dicanangkan agar relasi kunci baris tabel profil Pegawai selalu patuh tertaut kaku kepada referensi absolut entitas tabel unit kerja/divisi Struktur Departemen.
-
-### 6 Februari 2026 (Jumat)
-**Kegiatan:** Perancangan antarmuka tabel rekapitulasi real-time Pemantauan Absensi Harian mutakhir pada kontrol admin.
-**Fokus Teknis:** Merancang penampakan format visualisasi tabular tabular komprehensif dari jajaran pustaka struktur komponen UI *Datatables* untuk memonitor riwayat data serah terima waktu *real-time attendance* hari bersangkutan. Merespons ancaman *bottleneck* apabila sistem database memuntahkan pencarian query puluhan ribu data secara masif bebarengan, kerangka antrean langsung dilindungi eksekusi pemecahan limit data query perintah `->paginate(20)` langsung memutar intervensi kode kontroler kelas backend PHP.
-
-### 7 Februari 2026 (Sabtu)
-**Kegiatan:** Pemasangan dinamis status Event dan perancangan detail struktur arsitektur tabel Master Venue.
-**Fokus Teknis:** Mematangkan pilar operasional penempatan acara kegiatan administratif (*Event*). Sistem model penyisipan relasi berlapis format koneksi parameter struktural logis di injeksikan di instrumen Eloquent ORM. Mengadaptasi perancangan struktur relasi fungsional di mana pembuatan acara / rapat mutlak mewajibkan tautan intervensi id identitas fungsionalitas fasilitas ketersediaan lokasi spesifik asali absensi lokasi event acara tersebut (**Master Venue**).
-
-### 9 Februari 2026 (Senin)
-**Kegiatan:** Pembuatan logika parameter laporan cetak mutlak yang di-parsing rilis berformat PDF atau spreadsheet operasi Excel.
-**Fokus Teknis:** Fitur penunjang penarikan berkas krusial administratif format cetak dieksekusi stabil. Parameter utilitas sistem ditambahkan intervensi fungsional ekstensi kelas rilis komponen library `barryvdh/laravel-dompdf` (Spesifik diperuntukkan konversi spesifik tampilan instrumen `view` elemen susun HTML seketika difabrikasi memadat menjadi format pembentukan file paten PDF mandiri PDF murni). Selain PDF, dicolok modul *package* `Maatwebsite/Laravel-Excel` buat menagih penyusunan olahan *spreadsheet* arsip data absolut. Diperbaiki juga keluhan masalah di mana tabel terbelah cacat pemformatannya dengan kuncian properti rilis format CSS: `page-break-inside: avoid`.
-
-### 10 Februari 2026 (Selasa)
-**Kegiatan:** Finalisasi Admin Panel, perbaikan bug minor responsivitas layout visual, serta fungsi log rekam jejak aktivitas operasional.
-**Fokus Teknis:** Antarmuka visual panel *back-office* mutlak dieksekusi ditutup disepakati paripurna (100% kelar Selesai). Memastikan fungsional keamanan penelusuran histori kegiatan terkalibrasi aman meraba pergerakan setiap klik pengubah intervensi kegiatan akun admin disuntik pengkodean arsitekturnya untuk menyimpan riwayat audit (*tracing manipulation*) terekam stabil melalui sinkronisasi *backend logging system database* asali rute fungsionalitas khusus (`admin_log`). Layout responsif gawai web *mobile portrait mode* dituntaskan tanpa sisa error cacat *padding margin* sama sekali.
+Berikut adalah rincian fungsionalitas harian yang dikerjakan:
 
 ---
 
-## FASE 2: API Utama, Pivot Webview Hindari Manipulasi Fake GPS, & Sistem Face AI
+## FASE 1: Dasbor Admin Panel (Laravel)
 
-### 11 Februari 2026 (Rabu)
-**Kegiatan:** Mulai merancang Backend API (APIBKNOA), di sisi lain mencarikan arsitektur antarmuka klien Web-Base di Mobile (Format Webview).
-**Fokus Teknis:** Infrastruktur back-end arsitektur aplikasi beralih gigi membangun kerangka fondasi server utama murni RESTful `/api` di bawah ekosistem base mutlak platform Laravel. Saat operasi rute berlangsung, tim Front-end juga menyelisik percobaan mengolah *Slicing UI front-end* mutlak klien gawai pengguna melalui desain aplikasi browser format HTML/JS dinamis yang dicanangkan khusus target rencana awal ditujukan murni dipoles diarsip wujud format .APK lewat integrasi instrumen perizinan ekstensi plugin mutakhir framework instan berformat spesifik tipe *Webview/Cordova*.
+### Selasa, 3 Februari 2026
+**Kegiatan:** Setup awal sistem, instalasi kerangka dasar Laravel, dan perancangan skema database.
+**Fokus Teknis:** Proyek dimulai dengan melakukan instalasi framework Laravel menggunakan Composer (`composer create-project`). Selanjutnya, merancang struktur database relasional di MySQL (`antispoof_attendance.sql`) yang diimplementasikan melalui *migration* bawaan Laravel. Tabel utama yang disiapkan meliputi `users`, `departments`, `events`, `venues`, dan data absensi.
 
-### 12 Februari 2026 (Kamis)
-**Kegiatan:** Memrogram routing fungsi keamanan endpoint mutlak API demi autentikasi sistem perisai otorisasi ketersediaan JWT token session.
-**Fokus Teknis:** Semua jalan pintu rute protokol *URL endpoint API* ditutup berlapis benteng perimeter keamanan mutlak *stateless session*. Diintervensi sistem instrumen parameter keamanan tingkat superior memakai arsitektur paket utuh integrasi fungsi library eksternal tangguh rilis `tymon/jwt-auth`. Menagih sesi log in, mengelola verifikasi, membangkitkan string sesi *Bearer Token*, dan melebur token perlindungan kunci usai *Log out*.
+### Rabu, 4 Februari 2026
+**Kegiatan:** Pembuatan antarmuka visual (Slicing UI) untuk Dasbor Admin dan pembuatan hak akses.
+**Fokus Teknis:** Merancang desain tampilan menggunakan template Blade dan *Tailwind CSS*. Untuk sistem keamanan, fitur login dibuat dengan menyesuaikan fungsi `Auth::attempt`. Selain itu, hak akses dibedakan menggunakan *Middleware* agar menu yang muncul dapat disesuaikan untuk peran seperti *User*, *Admin*, dan *Superadmin*.
 
-### 13 Februari 2026 (Jumat)
-**Kegiatan:** Inisiasi logic sinkron pemrosesan endpoint API utama; Momen terungkapnya celah maut kerentanan parameter *Fake GPS* Ekosistem *Webview* awal.
-**Fokus Teknis:** Persiapan kerangka modul backend untuk fungsional penerimaan objek lat/long *JSON API* selesai. NAAS-NYA, tahapan validasi uji spesifikasi keamanan menampakkan **KECACATAN SKEMA FATAL**. Instrumen aplikasi berparameter model bungkus plugin tipe platform klien awal (*Webview HTML .apk* eksperimen) memiliki kecacatan fungsi bawaan murni celah proteksi level parah. Ekosistem instrumen deteksi lokasi bawaan sensor standar arsitek platform asali OS *Web Geolocation API* tak memiliki secuil fungsi hak pelacakan meretas parameter ke *operating system* gawai ponsel Android murni demi mendeteksi bila titik perizinan asal latitude/longitude titik bujur posisi koordinat GPS yang dipakai pengguna telah mengalami status modifikasi manipulatif sistem OS artifisal diinjeksi (*Mock Location App / Fake GPS Tool Bypass*). Ini menghancurkan seluruh keandalan validasi spesifikasi presensi absen geofencing radius parameter kantor secara total mutlak! Terblokir fungsi kelayakan standarisasi absolut.
+### Kamis, 5 Februari 2026
+**Kegiatan:** Pengerjaan halaman manajemen Master Data Pegawai dan Departemen.
+**Fokus Teknis:** Membuat fitur dasar CRUD (Create, Read, Update, Delete) untuk mendata profil pegawai. Tabel pegawai kemudian dihubungkan dengan tabel departemen menggunakan relasi *One-to-Many* pada tingkat model Eloquent, sehingga satu departemen dapat menaungi banyak pekerja.
 
-### 14 Februari 2026 (Sabtu)
-**Kegiatan:** Deklarasi Keputusan Pivot Haluan ke Framework Native App dan Validasi Routing fungsi HTTP Postman murni beruntun.
-**Fokus Teknis:** Menghadapi jalan buntu integritas *bypass mock location* kemarin, secara dramatis eksekusi kelanjutan instrumen klien berbasis format ekstensi balutan arsitek struktural kompilasi platform bawaan ekosistem bungkus UI **Webview mutlak dibatalkan mandek dikubur ditinggalkan sepenuhnya total parah.** Manajemen mengambil arah kompas *pivot strategis fundamental* dengan menginstruksikan pengkodean platform aplikasi instrumen klien *device tracking user* WAJIB direkayasa ulang mengadopsi format parameter lingkungan OS mutakhir yang mutlak menancap presisi langsung format berjenis spesifikasi kerangka basis tipe **Native Cross-Platform murni spesifikasi dasar Flutter**. Lewat format parameter integrasi kode fasa tipe native SDK ini, instrumen fungsional properti sistem asali `position.isMocked` yang dikunci Google OS mutlak bisa dilacak terbaca mendeteksi kecurangan hardware di HP tersangka *Fake GPS*. Hari eksekusinya diramaikan pengetesan rute backend API mutlak JSON Payload Postman murni aman spesifik merana ditata cemerlang sempurna. 
+### Jumat, 6 Februari 2026
+**Kegiatan:** Pembuatan halaman tabel Rekapitulasi Presensi Harian.
+**Fokus Teknis:** Membuat komponen tabel interaktif (*Datatables*) untuk memantau jam kehadiran karyawan setiap harinya. Untuk mencegah kemacetan (*loading lambat*) saat database mengambil kueri data dalam jumlah besar, sistem penarikan data diberi perintah `->paginate(20)` agar diload per halaman secara langsung dari backend.
 
-### 16 Februari 2026 (Senin)
-**Kegiatan:** Inisialisasi microservice spesifikasi parameter independen instrumen pendeteksi asali arsitektur log Face API (Python) model Liveness Detection Wajah AI. 
-**Fokus Teknis:** Menelusuri fase pendokumentasian arsitektur *Computer Vision library OpenCV* basis komputasi independen pemrograman *environment script* ekosistem Python 3 spesifik arsitek basis murni spesifikasi kecerdasan fungsional pengenalan bingkai muka identitas klasifikasi statis arsitektur pengenalan rupa mutlak anti-manipulasi penipuan presensi *spoofing* cetak gambar media artifisial.
+### Sabtu, 7 Februari 2026
+**Kegiatan:** Pembuatan manajemen pengelolaan Event dan Master Venue.
+**Fokus Teknis:** Mengembangkan modul untuk menjadwalkan suatu acara absensi (*Event*). Karena sebuah acara dapat menempati beberapa tempat sekaligus atau sebaliknya, relasi tabel diatur menggunakan tipe relasi *Many-to-Many* dengan tabel referensi lokasi gedung/fasilitas absensi (*Venue*).
 
-### 17 Februari 2026 (Selasa)
-**Kegiatan:** Eksplorasi kecepatan instrumen ragam spesifikasi berat parameter algoritma arsitektural asali komputasi model liveness mendeteksi deteksi akurasi *live media-attack* kamera utuh format arsitek *mobile limit*.
-**Fokus Teknis:** Menyusun arsitektur sistem tes lapangan fungsional benchmarking penampakan struktur deteksi manipulatif rilis simulasi peniruan peretasan arsitektural muka buatan (baik pemindaian manipulasi parameter potret benda cetak kertas fisik foto dua dimensi atau injeksi tipuan penampakan frame potret dari manipulasi layaran resolusi tablet gadget bercahaya layar gawai asali). Limitasi daya memori CPU ponsel gawai kelas merakyat/lemah menjadi batasan terberatnya.
+### Senin, 9 Februari 2026
+**Kegiatan:** Implementasi fitur filter pencarian dan cetak laporan PDF/Excel.
+**Fokus Teknis:** Fitur penarikan berkas laporan ditambahkan menggunakan pustaka `barryvdh/laravel-dompdf` untuk melakukan konversi file HTML ke bentuk PDF. Sedangkan untuk rekap data berbentuk format *spreadsheet* menggunakan `Maatwebsite/Laravel-Excel`. Kode CSS khusus (`page-break-inside: avoid`) juga diaplikasikan agar format tabel dasar PDF tidak terpotong antara halaman pertama dan kedua.
 
-### 18 Februari 2026 (Rabu)
-**Kegiatan:** Evaluasi pembuktian dan meraba limitasi parameter ketahanan akurasi banyak format pre-trained arsitektur kelas model *machine learning* berat open-source konvensional umum asali.
-**Fokus Teknis:** Menyimpulkan konklusi krusial perihal anjloknya rentetan parameter kalkulasi berat CPU atas sistem model jaringan syaraf tiruan mutlak yang tersedia di repository komunitas secara gratis yang amat lelet (memakan detik proses yang mengulur beku limit *app freeze*) karena algoritma spesifikasi berat di sisi gawai karyawan menilik parameter memori arsitektur. Membutuhkan alternatif lain yang radikal spesifik gesit ringan.
-
-### 19 Februari 2026 (Kamis)
-**Kegiatan:** Menemukan terobosan brilian spesifikasi teradopsi struktur parameter spesifik formasi cerdas algoritma modul CNN asali yakni format arsitektur arsitektural model 'Minifast v2'.
-**Fokus Teknis:** Rangkuman mutlak akhir parameter fase pencarian ini sukses mengkristal ke tahap paripurna penemuan arsitektur basis murni framework algoritma inovatif spesifikasi level brilian murni format basis kerangka penamaan **"Minifast v2"**. Keunggulan arsitektural utamanya absolut mutlak di atas rata-rata: model sangat cerdas mendeteksi kontur fisik bingkai Liveness tanpa meminta persyaratan resolusi memakan dimensi memori komputasi kelas parameter PC server rakus rakus RAM tinggi, namun spesifik mampu mengunci keandalan ketajaman konklusi spesifikasi muka palsu versus muka asli presisi tangkas aman mumpuni di proses murni di alat *mid-end Android* tercekik RAM biasa yang murni serba rentan.
-
-### 20 Februari 2026 (Jumat)
-**Kegiatan:** Slicing kerangka server modul instruksi parameter skrip arsitektur Phyton mandiri *wrapper Flask / FastAPI HTTP* memproses integrasi instruksi internal ekosistem model Liveness AI spesifikasi mutlak Minifast v2.
-**Fokus Teknis:** Modul pre-trained ditata rapi ke rute parameter fungsional basis penempatan infrastruktur basis *internal localhost private backend service local daemon script (`app.py`)* arsitektur framework *Flask* Python. Modul ini secara konseptual dirancang melayani gerusan *string request encoding* format *Base64 string parameter image rendering asali blob muka presensi* dari rute integrasi ekstensi *port tunneling request proxy spesifik mutlak APIBKNOA Laravel utama*. Ia murni memutar spesifikasi kembalian parameter validasi *parsing Boolean True/False Liveness* konfirmasi presisi muka deteksi otentik.
-
-### 21 Februari 2026 (Sabtu)
-**Kegiatan:** Set up sinkronisasi terapan spesifik fungsional proxy komunikasi rute parameter server internal perantara service Face API Python dan respon sub-rutin logik base sinkronisasi Backend Asali API Laravel Mutlak.
-**Fokus Teknis:** Parameter integrasi dihubungkan di file asali sistem spesifik `env` environment Laravel agar *CURL request/HTTP facade log* menautkan sinkronisasi asali eksekusi instruksi perantara spesifikasi respon waktu kilat asali server port port mutlak spesifik Phyton port lokal murni yang memproses *inference* arsitektural mutlak model minivast serempak berjalan utuh.
+### Selasa, 10 Februari 2026
+**Kegiatan:** Penyesuaian responsivitas Panel dan pembuatan fitur perekam rekam jejak.
+**Fokus Teknis:** Mengatasi bug kecil pada pergeseran tata letak UI saat Dasbor Admin dibuka menggunakan browser di ponsel kecil. Bersamaan dengan penyelesaian Admin Panel, fitur `admin_log` ditambahkan untuk merekam setiap aktivitas signifikan yang dilakukan pengguna setingkat Admin (misal merekam siapa yang menambah atau mengubah jam absen secara manual).
 
 ---
 
-## FASE 3: Klien Android Flutter, Sistem Mutlak Kiosk Anti Fake GPS, dan Resolusi Bug V2 Play Protect
+## FASE 2: Backend API Pokok, Pivot Batalnya Webview, dan Face AI
 
-### 23 Februari 2026 (Senin)
-**Kegiatan:** Inisialisasi arsitektur pondasi pangkalan ekosistem asali proyek aplikasi klien native *mobile* lintas parameter gawai (BKNOAapp) diusung ekosistem unggul rilis paten mutlak basis arsitektural rilis spesifikasi murni framework Flutter SDK OS mutakhir Google Native Framework SDK kompilasi SDK.
-**Fokus Teknis:** Mewujudkan keputusan pasca tragedi batal pivot Webview di tahap arsitektur fase awal tanggal 14 mutlak kemarin silam, dengan inisasi kerangka struktur kode perumusan folder OS mutakhir merestrukturisasi proyek Android *Native mobile apps basis Flutter SDK (`flutter create bkn_absen_app`)*. Penetapan struktur konfigurasi sinkron spesifikasi daftar manifest izin kompilasi asali base modul OS dependensi instalasi parameter `pubspec.yaml` dasar disiapkan. 
+### Rabu, 11 Februari 2026
+**Kegiatan:** Mulai mengatur rute untuk sistem API Utama, seraya memulai desain versi awal antarmuka karyawan (*Web-Base*).
+**Fokus Teknis:** Fokus berpindah ke penyusunan rute REST API di Laravel untuk menangani lalu lintas data dari aplikasi. Di waktu yang sama, tim meriset pembuatan aplikasi (*font-end*) berbasis HTML/JS dinamis biasa, yang rencananya akan dipaket menjadi format aplikasi `.apk` menggunakan teknologi *Native Webview*.
 
-### 24 Februari 2026 (Selasa)
-**Kegiatan:** Parameter tahapan fase pengumpulan elemen susunan *Slicing UI front-end visual* rincian desain mutakhir basis halaman integrasi otentikasi login Form otentikasi Mobile Flutter form rilis dasbor user di sinkron basis antarmuka sinkron murni.
-**Fokus Teknis:** Penerjemahan logika panduan estetik struktur hierarki visual antarmuka sistem di-arsitektur kedalam spesifik tumpukan *Widget form component tree nesting (`Column`, `Row`, `Container`, `Scaffold`, dan validasi kueri `TextFormField Regex string login Form input asali)* platform UI kompilasi Flutter spesifik material komponen OS responsif gesit layar format *portrait*.
+### Kamis, 12 Februari 2026
+**Kegiatan:** Konfigurasi modul keamanan *Bearer Token* di sisi API.
+**Fokus Teknis:** Menyiapkan parameter perisai pelindung pada setiap jalur API. Memakai ekstensi library `tymon/jwt-auth` untuk menagih, membaca, dan membangkitkan kunci sementara *JSON Web Token* (JWT) yang didapatkan saat pengguna berhasil login ke dalam sistem aplikasi.
 
-### 25 Februari 2026 (Rabu)
-**Kegiatan:** Merampungkan susun Slicing antarmuka fungsional tata ruang arsitek rekam jejak riwayat mutlak spesifikasi menu asali kehadiran serta meramu setup kerangka estetika layout paten mutlak basis spesifikasi khusus arsitek monokrom instrumen operasional gawai stand instalasi dudukan basis tetap spesifikasi menu khusus penempatan alat 'Kiosk Presensi mode'.
-**Fokus Teknis:** Mode antarmuka OS untuk tablet perusahaan asali yang tak dibawa pulang (*Mode Geladak / Kiosk*) dirancang memiliki tata warna *Dark Mode elegan UI/UX contrast monokrom* agar profesional saat dilihat di lobi resepsionis mutlak operasional fungsional gawai standar tablet rilis format gawai internal perusahaan mutlak. 
+### Jumat, 13 Februari 2026
+**Kegiatan:** Pembuatan rute API absensi dan temuan kerentanan *Fake GPS* pada eksperimen Webview.
+**Fokus Teknis:** Ketika API absen disiapkan, sistem Geolocation API bawaan browser dalam implementasi purwarupa aplikasi *Webview* menunjukkan kendala fatal. Teknologi ini tidak memiliki dukungan ke level *Operating System* (OS) perangkat untuk mendeteksi apakah kordinat kustomer dimanipulasi dengan peretasan seperti alat aplikasi tiruan spesifik *Mock Location (Fake GPS)* yang populer di pasaran. 
 
-### 26 Februari 2026 (Kamis)
-**Kegiatan:** Aplikasi integrasi rilis variabel parsing perantara respon parameter komunikasi HTTP form REST API Login sinkron arsitektur sistem memori terstruktur kelas manajemen spesifik otomatis parameter state Riverpod.
-**Fokus Teknis:** Navigasi state peralihan login logout aplikasi tak lagi menggunakan state kuno statis sinkron manual *SetState*, melainkan disuntik asali rilis plugin manajemen *state provider arsitektural canggih Riverpod package asali mutlak otomatis*. Pengalokasian string parameter JWT Token masuk ke memori *Storage Secure API Key Preferences rilis otentik token sinkron asali session storage*.
+### Sabtu, 14 Februari 2026
+**Kegiatan:** Pivot kerangka pengembangan pindah ke *Native* dan uji ketahanan API.
+**Fokus Teknis:** Mengingat integritas area absen (`Radius Geofence`) akan hancur jika pengguna memalsukan lokasi, maka konsep pembuatan perangkat perantara metode **Webview resmi dibatalkan total**. Langkah pivot diambil dengan merancang instruksi untuk berpindah membangun platform karyawan beralih adopsi total ke teknologi kerangka kerja **Flutter (Native Cross-Platform)** agar sanggup menembus sistem keamanan parameter deteksi Android *Mock Location Provider*. Skema rute endpoint API dieksekusi simulasi menggunakan *Postman HTTP Client*.
 
-### 27 Februari 2026 (Jumat)
-**Kegiatan:** Sinkronisasi implementasi arsitektur parameter intervensi spesifik pelacak perizinan GPS geolokasi (Geofencing Absensi Celah Tutup Fake GPS) menambal kerentanan asali sistem Webview jadul lalu.
-**Fokus Teknis:** Instalasi package `geolocator` rilis OS ditautkan perizinan sensor paten sistem. Eksekusi spesifik pencegahan OS deteksi bypass lokasi dieksekusi murni hari ini lewat intervensi kalkulasi rilis pelacakan asali fungsi OS `position.isMocked` murni bawaan deteksi flag mutlak API Flutter Native mutakhir ini! Diperkuat penjagaan zona radius presisi dengan hitungan koordinat matematis mutlak *Haversine Formula* menyingkirkan oknum rilis bypass location palsu (*fake emulator GPS location mock* terblokir instan ditutup *Access Rejected Flag Alert Validasi Wajib Mutlak!).
+### Senin, 16 Februari 2026
+**Kegiatan:** Memikirkan inisialisasi layanan microservice terpisah pengenalan Face API dan riset model liveness wajah.
+**Fokus Teknis:** Karena fitur autentikasi menuntut pemeriksaan parameter wajah, tim mengawasi pembuatan arsitektur program Python mandiri dan membandingkan beberapa *library* tipe fungsional *OpenCV Computer Vision*. Fokusnya pada model kecerdasan buatan (*Artificial Intelligence*) spesifik untuk verifikasi keaslian parameter fisik objek *Anti-Spoofing Liveness*.
 
-### 28 Februari 2026 (Sabtu)
-**Kegiatan:** Eksekusi set up komponen sinkron antarmuka operasional fungsional basis potret *Live Stream UI format basis mutakhir integrasi plugin Camera V2 murni asali OS gawai Android OS bawaan Native API*.
-**Fokus Teknis:** Lensa potret ditautkan menggunakan *native hook bridge system asali plugin mutakhir camera asali package* Flutter agar memonitor merender preview memori presisi tangkapan *streaming bit-rate resolusi rilis tertinggi spesifikasi HD gawai OS OS* terintegrasi instan ke tatanan layout Widget antarmuka asali potret presensi mumpuni tanpa jeda di dalam UI asali.
+### Selasa, 17 Februari 2026
+**Kegiatan:** Melakukan eksplorasi daya kinerja model pre-trained algoritma deteksi manipulasi di format mobile.
+**Fokus Teknis:** Simulasi tes dengan menaruh topologi model kecerdasan pendeteksi identitas foto pada gawai spesifikasi kelas bawah. Banyak ditemukan bahwa arsitektur bawaan yang kompleks terlalu banyak memberikan beban komputasi CPU dan memori, sehingga tangkapan kamera dari gawai kelas *mid-end* menjadi mandek alias berhenti sementara (*freeze*).
 
-### 2 Maret 2026 (Senin)
-**Kegiatan:** Transmisi parameter data pengiriman integrasi nilai koordinat titik geolokasi asali bersama dengan format sinkron logik parameter muatan konversi `image binary Base64` tangkapan potret fungsional disalurkan instan lewat protokol payload POST Request konektor *Endpoint gerbang mutlak server Utama API Laravel rilis presensi*.
-**Fokus Teknis:** Sinkron intersep HTTP integrasi form penyerahan JSON spesifik *form-data HTTP payload request* menyodorkan string sinkron parameter kordinat spesifikasi `lat/lng` seraya asali *file binary potret real* asali potret.
+### Rabu, 18 Februari 2026
+**Kegiatan:** Memilah referensi kualitas akurasi tangkal pemalsuan tipe media fisik/layar HP.
+**Fokus Teknis:** Sistem terus menuntut mekanisasi filter protektor algoritma *open-source* yang tidak hanya sigap mencegah manipulasi fisik (seperti disodorkan kerta cetakan foto / gambar gawai dari peranti eksternal), tetapi juga sangat ringan memakan RAM perangkat ketika melakukan inferensi perbandingan wajah.
 
-### 3 Maret 2026 (Selasa)
-**Kegiatan:** Inisiasi integrasi kerangka struktur logik spesifik variabel respon parsial pendaur ulang fungsional API spesifik asali menu visual UI Alert dialog asali pendeteksi error spesifk konfirmasi kegagalan parameter asali Face Anti-Spoofing spesifik konklusi Minifast AI response.
-**Fokus Teknis:** Menampilkan alert UI fungsional spesifik tipe *snackbar error failure alert box UI konfirmasi penolakan absen Gagal Wajah tidak Valid (Rejection Alert Warning Dialog Box Validasi Wajah Gagal Parameter Valid).*
+### Kamis, 19 Februari 2026
+**Kegiatan:** Penemuan model cerdas algoritma *Convolutional Neural Network (CNN) 'Minifast v2'*.
+**Fokus Teknis:** Pencarian panjang menyingkap sebuah penemuan terbaik yang disebut arsitektur algoritma **"Minifast v2"**. Keistimewaan metode ini dibanding sistem serupa adalah ia berukuran super ringkas dalam menghitung nilai prediksi ancaman percaloan wajah foto fisik 3D secara presisi, namun tidak membuat perangkat pengguna patah-patah kala memprosesnya di Android murah.
 
-### 4 Maret 2026 (Rabu)
-**Kegiatan:** Operasional pelaksanaan tahap *Testing lapangan QA Inspeksi presensi luar internal kantor murni sinkron langsung memakai spesifikasi asali spesimen operasional tipe HP platform uji coba gawai asali OS OS spesifik Android uji Test Device.*
-**Fokus Teknis:** Modul uji stres sinkronisasi pengetesan parameter konektivitas sinyal *throttle bandwidth lemah operator limitasi* dilakukan memonitor potensi status *Timeout error integrasi konektor HTTP Request API*.
+### Jumat, 20 Februari 2026
+**Kegiatan:** Penyusunan kode program mini-server Python wrapper menggunakan *Flask / FastAPI*.
+**Fokus Teknis:** Kode program *Minifast v2* dikemas rapi menjadi server kecil backend berbasis port independen web di skrip internal Python `app.py` menggunakan framework Flask. Logic dirancang sangat sepele: ia akan menagih string terjemahan gambar karakter (`Base64 format image`) dari layanan Backend Utama Laravel, kemudian *Minifast* ini akan menganalisisnya dan menerbitkan jawaban prediksi tipe Boolean (`True / False` Wajah Lolos).
 
-### 5 Maret 2026 (Kamis)
-**Kegiatan:** Modifikasi pencegahan memory leak penumpukan tumpukan cache memori buffer tangkapan rilis fungsi RAM *Camera UI frame buffer drop error* serta pengaturan instalasi spesifk `retry timeout automatic system logik re-render sinkron` manakala parameter transfer integrasi upload gambar di OS macet antrean jaringan asali *server backend* tak bersahabat.
-**Fokus Teknis:** Limitasi OS *App Freeze hang UI freeze state tertahan* dicegah dengan menyelaraskan spesifk pembersihan memori memori UI asali membebaskan asali frame tangkapan `dispose camera controller` berurut spesifik agar ram OS tak *crash Out Of Memory fatal mutlak exception*.
-
-### 6 Maret 2026 (Jumat)
-**Kegiatan:** Pengkodean rekayasa rahasia *trigger gesture* spesifk format gestur sentuh aksi cepat tangkas rutinitas ritmis 'Triple-Click' parameter ketukan logo operasional statis *Kiosk UI* memicu rotasi pelenturan limitasi wujud pelepasan dimensi OS fungsionalitas UI `Immersive Fullscreen mutlak murni utuh`.
-**Fokus Teknis:** Integrasi sentuh parameter widget sinkron asali `<GestureDetector>` murni pendeteksi ritme asali parameter mutlak jeda *miliseconds rapat* meraba event klik tiga ketukan serempak asali menyembunyikan status bar sinyal HP Android tenggelam tertutup paksa mutlak presisi sinkron eksekusi: `SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky)`. Karyawan absen asali sinkron diblokir parameter kembalian back menu tak bisa kabur memanipulasi spesifikasi penutupan aplikasi Kiosk presensi secara paksa di alat tablet asali mutlak. 
-
-### 7 Maret 2026 (Sabtu)
-**Kegiatan:** Penataan spesifikasi bentuk ornamen UI `Oval Shape masking` penyelarasan batas batas panduan panduan penunjuk panduan wajah parameter letak antarmuka layer komponen antarmuka presisi kamera.
-**Fokus Teknis:** Rekayasa panduan *framing proporsional shape kontur dagu asali batas orientasi struktur sinkron tengah pandangan garis pandang pupil mata presisi sinkron asali sinkron frame drop mutlak*. Karyawan diarahkan pas masuk lingkaran sebelum divalidasi pemindaian sinkron.
-
-### 9 Maret 2026 (Senin)
-**Kegiatan:** Optimalisasi operasi sterilisasi ukuran berat repositori menumpas menghancurkan sinkron asali bongkahan beban kocar kacir file mutlak *dead code sisa eksperimen asali* dan sinkronisasi modifikasi peringanan berat asali berkas mutlak ukuran elemen grafis SVG struktur tak di muat.
-**Fokus Teknis:** Pengkondisian pangkalan `app bundle` asali mutlak memangkas asali ukuran asali berat `build .apk` rilis bersih ramping stabil mutlak memori spesifik enteng efisien optimal mutakhir OS asali. 
-
-### 10 Maret 2026 (Selasa)
-**Kegiatan:** [Fixing Bug Terpecahkan] Merampungkan modifikasi flag korelasi pengecekan status menu logika error inkonsistensi perputaran variabel sinkron status fungsional jadwal flag sistem pengecualian jadwal konfirmasi ketidakhadiran berlabel cuti presensi parameter 'Day Off (DO)' mutlak sisi integrasi backend.
-**Fokus Teknis:** Korelasi nilai konversi kalender cuti logis 'DO' hari bersangkutan sukses dirapihkan mengalir utuh membenahi sinkronisasi fungsional kalendar backend database ke asali mutlak notifikasi di rilis antarmuka HP staf sinkron mutlak murni stabil perbaikan total. 
-
-### 11 Maret 2026 (Rabu)
-**Kegiatan:** Modifikasi eksekusi sinkron penyempurnaan fitur unggahan struktur penambahan ekstensi asali rute *endpoint* integrasi komunikasi aliran paket basis konversi arsitektur fungsional *Canvas Base64 asali wujud Signature* persetujuan grafik Tanda Tangan spesifik administrator hak asali superior level 'Supervisor'.
-**Fokus Teknis:** Merancang sinkron platform penagihan *canvas doodle signature drag drop input form panel screen parameter mutlak mobile sinkronisasi unggahan grafis mutlak mutakhir*. 
-
-### 12 Maret 2026 (Kamis)
-**Kegiatan:** [DESAIN UI PWA LOGO RESOLUSI TINGGI 4K] Desain mutlak pembaruan identitas perancangan aset logo properti visual merek rilis format grafis komersial BKNOAapp (MAVEN) wujud resolusi 4K tinggi sinkron dan menyempurnakan fitur penyelesaian izin spesifikasi penguncian persetujuan administrasi. 
-**Fokus Teknis:** Hari dititikberatkan menyelesaikan tata letak *trademark logo aplikasi MAVEN asali mutlak komersial perusahaan wujud .png bersih absolut tanpa batas pixel pecah jaggies murni asali OS launcher app drawer HP OS asali*. Logo dibubuhi kerangka wujud pelukan *container circular latar putih netral* agar membedakan presisi asali kontras visual pada wujud layar presentasi mode *Kiosk Geladak Absensi monokrom pekat* sinkron asali selaras.
-
-### 13 Maret 2026 (Jumat)
-**Kegiatan:** [Fixing Bug Red Flag Play Protect] Memecahkan isolasi peringatan keras pemblokan blokade OS asali OS Play Protect internal sistem keamanan Google saat proses spesifikasi penyaluran distribusi asali paket build format testing file paket rilis bundle debug instalasi gagal mentok fatal.
-**Fokus Teknis:** Android gawai menyeka instalasi buatan murni dengan alasan tak dikenal dan mengharamkan rilis eksekusi *debug bundle paket mutlak asali*. Rintangan teratasi ditanggulangi telak memodifikasi asali wujud arsitektur konfigurasi pembuatan implementasi rilis file rahasia otoritas izin penyandian paten paten rilis rilis wujud sertifikat arsitektur keamanan absolut file: `key.jks` secara utuh struktural murni operasional disuntik valid sinkron ke properti arsitektur instalasi mutlak Android build OS.
-
-### 14 Maret 2026 (Sabtu)
-**Kegiatan:** Penataan spesifikasi injeksi parameter kepingan arsitektur konfigurasi ke dalam variabel parameter fundamental level akar mutlak konfigurasi konfigurasi akar file asali `build.gradle` properti skema arsitektur Android Native.
-**Fokus Teknis:** Menyiapkan parameter asali eksekusi sinkron skema konfigurasi parameter keabsahan perizinan mutlak skema kemanan pengunci enkripsi utuh sinkron properti wujud paten *V2 Scheme Signature* (`v2SigningEnabled true`) secara sistematis di properti root Android, bertandem merilis kompilasi injeksi sistem mutlak penyembunyian algoritma arsitektur pengabur struktur nama variabel kelas kelas rentan sinkronisasi peretasan ekstensi OS `Proguard obfuscation file rule mutakhir utuh paten Android asali mutlak`.
-
-### 16 Maret 2026 (Senin)
-**Kegiatan:** [*Milestone Deployment*] Mengeksekusi tahapan krusial tahap kompilasi peluncuran pelepasan format *Build Release final bundle rilis .apk asali produksi*. Diikuti penyelenggaraan fasa kegiatan distribusi sinkron pengerahan operasional ke tingkat validasi pengguna pegawai sinkronisasi *Alpha-Test internal phase* sinkron stabil murni.
-**Fokus Teknis:** Hari besar untuk platform gawai asali versi Android OS! Instruksi eksekusi kompilasi kode dilepaskan utuh tuntas menuju parameter baris antrean kode baris terminal eksekusi asali param: `flutter build apk --release --obfuscate --split-debug-info` mutlak mutakhir OS sinkron. Menghasilkan wujud fisik format *bundle install file rilis asali APK (Android Package) mumpuni utuh tuntas disahkan* yang berhasil diamankan perlindungan Proguard asali V2 Signing. Operasional distribusi berjalan 100% mulus sinkron kepada penguji fungsional *Android real internal staff device* tanpa ada keluhan OS instalasi Play Protect sinkron asali murni tuntas kelar memakan gawai stabil sinkron mutlak Selesai!.
-
-### 17 Maret 2026 (Selasa)
-**Kegiatan:** Agenda tahap perencanaan pemindahan konfigurasi adaptif spesifikasi transisi alur platform parameter *build deployment OS OS ekosistem* dari format target ekosistem OS Android OS Android OS berpindah paten menembus arah penataan sasaran gawai manufaktur ekosistem properti paten arsitektur framework *Apple spesifikasi ekosistem OS asali iOS*.
-**Fokus Teknis:** Melakukan tahap spesifik transisi pengalihan sasaran basis wujud OS perangkat penyesuaian properti murni dependensi perizinan parameter bahasa asali Objective-C/Swift spesifik paten ekosistem mutlak Apple spesifik gawai sinkronisasi OS ekosistem Apple iPhone murni setup arsitektural spesifik.
-
-### 18 Maret 2026 (Rabu)
-**Kegiatan:** Mengamankan sisipan pengizinan tag privasi otoritas OS dasar ke dalam daftar konfigurasi kerangka fundamental struktur modul root ekosistem target rilis `info.plist` serta penyesuaian dependensi CocoaPods mutakhir.
-**Fokus Teknis:** Modifikasi skema pelestarian arsitektur asali sinkron sensor proteksi ekosistem Apple *sandbox parameter perizinan sinkron murni privasi asali user* mutlak dipatri di arsitektur tag mutlak wujud parameter privasi hak paten `<key>NSCameraUsageDescription</key>` dan tag pelacak `<key>NSLocationWhenInUseUsageDescription</key>` spesifk utuh rilis. Eksekusi pelengkapan pangkalan arsitektur sinkron library utuh Apple OS dikemas lewat param CLI CLI: `pod install` asali OS iOS. Murni stabil spesifk sinkron. 
-
-### 19 Maret 2026 (Kamis)
-**Kegiatan:** [MAC DEADLOCK ERROR - HARI KEMATIAN RILIS APPLE] Kekosongan prasarana sistem operasi spesifikasi khusus rilis komputasi perangkat arsitektur khusus memicu fatal gagal fungsi penghentian proyek (*deadlock mandek total*) kompilasi fasa akhir OS platform rilis gawai iPhone iOS mutlak asali Apple Native.
-**Fokus Teknis:** **Tragedi infrastruktur hari terakhir fase operasional Development App menjelang detik-detik rehat dimulainya jadwal linimasa liburan massal esok kalinya!** Syarat kebijakan operasional ekosistem korporasi perangkat produsen mutlak **Apple** telah mewajibkan secara struktural proses perakitan asali OS sinkronisasi operasi render proses `Compile Rilis Native kompilasi asali OS spesifk alat gawai iPhone asali OS Apple iOS murni OS` WAJIB mengandalkan fungsionalisasi mutlak peranan perangkat *XCode App Software Apple* yang HANYA diperuntukkan eksklusif merender menopang operasi instalasi di atas fondasi operasional wujud arsitektur peranti kelas properti mesin sistem komputasi ber-titel **macOS (dioperasikan paten menunggangi spesifikasi perangkat keras utuh arsitektur produk wujud fisik alat PC Apple Mac berbadan Macbook Pro atau jajaran keluarga peranti fisik Desktop PC iMac mutlak murni absolut ekosistem asali OS)**. 
-NAHASNYA di lingkungan kantor secara keseluruhan inventaris ruangan arsitektur sama sekali asali *tak ada eksistensi fasilitas secuil properti spesifikasi fisik alat PC Mac sebijipun asali komputer sinkronisasi macOS* mutlak tiada! Kondisi ini sontak memecahkan rilis gawai Native Flutter iPhone OS sinkron hancur membatalkan skema *Build Native iOS compile code eksekutor sinkron mati fatal 100%*. Tak sanggup dikerjakan terhenti selamanya OS ini. Seluruh kegiatan tim pun dihentikan rehat mandek buntu. Pekerjaan berhenti menyambut libur panjang keesokan harinya secara serempak penuh.
-
-*(20 Maret 2026 s/d 29 Maret 2026: Aktivitas Libur Massal Proyek Dihentikan Istirahat Total Nasional)*
+### Sabtu, 21 Februari 2026
+**Kegiatan:** Integrasi service eksternal internal *Face API Python* dari Backend API Utama.
+**Fokus Teknis:** Merangkai agar skrip *controller* di Laravel bisa mengoperkan setiap data rilis Base64 foto dari klien menyeberang langsung diteruskan lewat pemanggilan proksi internal (`cURL / Request`) langsung jatuh ke tangkapan port alamat peladen *Face Python AI*. Tes *response time* ditinjau lancar dalam bilangan detik. Selesai.
 
 ---
 
-## FASE 4: Pembentukan Alternatif Strategi Era Web PWA, Pemecahan Algoritma Wajah Mutakhir, Dan Rampung Total Tuntas
+## FASE 3: Klien Android Native (Flutter), Kiosk Sistem, & Resolusi Bug Integrasi Kompilasi
 
-### 30 Maret 2026 (Senin)
-**Kegiatan:** [Jeda Purna Libur - PIVOT WEB KE PWA IPHONE] Pembuangan spesifikasi OS target build Flutter parameter file ekstensi asali rilis iOS asali Native, lantas ditukar guling dipivot cerdas membidik sasaran alokasi perakitan aplikasi interaktif *Progressive Web App Web (PWA Khusus Safari iOS)* memanfaatkan React MVC Vite spesifik. 
-**Fokus Teknis:** Langkah akal-akalan solusi fungsional revolusioner cerdik mengalihkan keterbatasan alat wujud Mac kemarin sinkron digantikan. Menggalang *slicing* fungsional UI replikasi cermin murni dari wajah proporsi rupa UI Flutter OS dengan memakai kekuatan arsitektur fondasi dinamis asali komponen perpustakaan canggih spesifik fungsional OS OS asali Web mutakhir **React.JS** asali disesuaikan kekuatan eksekutor kompilator tercepat asali wujud sinkron OS **Bundler Vite**. Komposisi spesifk bentuk css dieksekusi gesit format utilitas utilitas utilitas **Tailwind CSS**. Diusahakan penataan peleraian sinkron asali wujud tag `<style>` aman `padding-top: env(safe-area-inset-top)` khusus menghindari pemotongan cacat tata ruang desain properti wujud poni lengkung takik batas fisik komponen hardware atas layar spesifk HP iPhone OS (*Notch/Dynamic Island Apple*) agar responsif harmonis mulus mutlak aman 100% rilis.
+### Senin, 23 Februari 2026
+**Kegiatan:** Inisialisasi pondasi proyek aplikasi berbasis kerangka kerja ekosistem aplikasi lintas OS Flutter (*BKNOAapp*).
+**Fokus Teknis:** Meneruskan wacana migrasi pivot ke native dengan menata *repository codebase* di baris perintah awal `flutter create`. Pemilihan konfigurasi paket *dependencies* pendukung ditaruh secara berurutan persis pada perancangan direktori *pubspec.yaml*. Segala berkas diatur menjadi modular (pisahkan UI, model, route, service).
 
-### 31 Maret 2026 (Selasa)
-**Kegiatan:** [HOTFIX BONGKAR BUG RILIS WAJAH SINKRON MUTLAK] - Perombakan restrukturisasai arsitektur rute verifikator sistem komputasi asali sensor pendeteksi rilis potret wujud kontur parameter sinkronisasi deteksi sinkron pemindaian verifikasi identifikasi sinkron *Face Anti-Spoof* Flutter Mobile OS dari beban kalkulasi parameter *5-Step Sequence lambat CPU gawai* dibongkar beralih format disederhanakan spesifk digabung asali murni **1-Step Verification Verifikasi Cepat Tangkas Presisi Ekstrem Tinggi Validasi Liveness Kuat.**
-**Fokus Teknis:** Memperbaiki sistem rilis problem alur waktu absen memakan waktu memori berat kalkulasi perangkat. Asalnya gawai Flutter spesifk *Native Android asali rilis* mengeksekusi urutan pemindaian rincian pemahaman mendeteksi parameter sinkron OS OS muka perlahan rilis urut spesifik asali berlarut asali format *5-Step (Tugas memutar kepala noleh senyum kedip bergilir bergantian)* yang rakus membekukan stabilitas sinkron *freeze CPU memori alat mid-end sinkron*. Aturan berat ini diamputasi rilis sinkron murni dibuang diganti modifikasi mutlak *1-STEP Verification OS*. Foto dikunci sekejap asali sinkron potret spesifk fitur integrasi format *Live Stream Frame Drop sekilas kilat sekejap* dan sepesifikasi liveness data tersebut seketika dipercaya murni dioper diserahkan kepada kekuatan *inferring* akurasi Backend arsitektur mesin model canggih *Face API murni (Minifast v2 Phyton Server asali mutlak)* di port terisolasi backend. Sinkronisasi OS berhasil menaikkan kecepatan daya muat absensi kilat terobosan berdetik rilis ringkas cepat aman *High-Precision valid*.
+### Selasa, 24 Februari 2026
+**Kegiatan:** Merancang desain translasi grafis *Slicing UI Front-End* untuk halaman Login ke skema Widget *Dashboard*.
+**Fokus Teknis:** Menyalin logika estetika panduan *mockup* menu antarmuka login yang dibuat lewat penyusunan instrumen struktural berlapis komponen turunan komponen dasar ekosistem Widget OS material (Membikin *Scaffold*, kolom `Column`, `Container`, dan fungsional tombol penadah pengiriman). Validasi tipe masukan tipe data `Regex Email` form ditanam.
 
-### 1 April 2026 (Rabu)
-**Kegiatan:** Merampungkan fitur intervensi akses alat alat Kamera ekstensi integrasi OS WebRTC di React PWA Safari iOS. Dilanjutkan integrasi penyuntikan pelindung mutlak parameter parameter isolasi filter rilis identifikasi rasio wujud pengetesan orientasi penguncian penangkalan pencegahan peretasan format spesifikasi antarmuka resolusi Dekstop Bypass Bypass spesifik Browser desktop diakhiri dengan tuntasnya OS rilis *Deployment Server Production* Keseluruhan Spesifik Final Mutlak!
-**Fokus Teknis:** PWA iPhone Safari dipasang integrasi pembuka gembok konektivitas spesifk jembatan perangkat keras asali rilis OS Web mutakhir yakni intervensi parameter API spesifikasi asali spesifik browser asali: *WebRTC Camera Access API via rutin intervensi `navigator.mediaDevices.getUserMedia()` murni*. 
-Penyesuaian perisa anti-modifikasi curang via alat Laptop/Dekstop Mac/PC Windows ditepis murni mutlak: Disuntik rilis kuncian arsitektural asali pengecek parameter informasi informasi header informasi struktur OS perangkat mutlak pemanggil web: `userAgent browser string detector sinkron`. Diperketat pula restriksi filter layar dimensi *script Aspect Ratio orientasi vertical dimensi murni HP 16:9 mutlak portrait limit*. Fitur Web OS PWA React mutlak Selesai!.
+### Rabu, 25 Februari 2026
+**Kegiatan:** Mendesain antarmuka riwayat kehadiran plus menyajikan spesifikasi penyusunan estetika antarmuka UI spesial layar *Kiosk Mode*.
+**Fokus Teknis:** Tata letak menu disiapkan mengakomodir rincian data jam ketidakhadiran dalam elemen gulir data *ListView*. Bersamaan dengan merakit khusus halaman presensi tablet Kiosk di mana tampilan bernuansa warna gelap nan *elegant black and white monokrom* guna ditampilan anggun proporsional menyambut resepsionis tamu kantor perusahaan. 
 
-Tepat per hari ini 1 April 2026, Keseluruhan Rangkaian Direktori Bundle Rilis Pemasangan Proyek Sistem Presensi Liveness Murni Terpadu Paripurna Telah Diklaim Sukses Memenuhi Target Garis Milestone Operasional Sepenuhnya Disetujui Keseluruhan 100% Akhir Final! (Selesai).
+### Kamis, 26 Februari 2026
+**Kegiatan:** Pergantian metode manipulasi navigasi kontrol memori asali via pengelolaan state mutakhir ekosistem pustaka `Riverpod`.
+**Fokus Teknis:** Cara lama melakukan pengaturan perubahan layar UI dengan menyetel kondisi primitif statis (`setState()`) dibuang murni diganti memakai pola pengaturan *provider state architecture Package flutter_riverpod*. Sinkronisasi penyimpanan status login token diamankan terenkripsi di parameter ekosistem gawai dan akan ditukar reaktif perihal perintah *Observer Ref.Watch* di transisi halaman.
+
+### Jumat, 27 Februari 2026
+**Kegiatan:** Eksekusi plugin sensor Geolokasi dan pengecekan proteksi parameter kecurangan alat *Fake GPS*.
+**Fokus Teknis:** Menyelesaikan masalah rentan lama dengan melibatkan *package geolocator* untuk meminta titik asli spesimen koordinat satelit modul sistem HP. Menggunakan rumusan matematis pengukur radius bengkok bumi *Haversine Formula* menakar batas area Geofencing jarak gedung pabrik presensi. Di titik keamanannya, program mendeteksi jika flag native tersembunyi berlabel `position.isMocked` menunjukkan indikator "Iya / True", maka absensi karyawan *dijegal langsung digagalkan* di tempat atas pertanda intervensi pemalsuan OS Fake Emulator GPS lokasi. Fitur sangat krusial.
+
+### Sabtu, 28 Februari 2026
+**Kegiatan:** Mengaktifkan hak pemakaian alat sistem Native sensor Lensa plugin Camera.
+**Fokus Teknis:** Membuka komponen bawaaan hak izin pembedahan pengoperasian fungsi kontrol lensa *camera package* di gawai perangkat klien. Melakukan pembentukan *controller setup Preview layer UI tangkapan stream kamera HD layar muka resolusi real-time*.
+
+### Senin, 2 Maret 2026
+**Kegiatan:** Memprogram alur aliran parameter data menuju kerangka backend infrastruktur REST API utama (Laravel).
+**Fokus Teknis:** Operasi penekanan tombol presensi menautkan rutinitas pengiriman form protokol asali JSON `HTTP Request`. Kode dikumpulkan mencakup kompilasi angka posisi *latitude/longitude*, lalu foto dirapatkan kedalam nilai tipe `image binary format base64 encoding`, dilampirkan otorisasi sandi gembok token JWT. Modul rilis aman dan menyuplai data murni ke form validasi penerimaan `Gateway API Laravel Attendance`.
+
+### Selasa, 3 Maret 2026
+**Kegiatan:** Membangkitkan rekayasa visual notifikaktor pendeteksi hasil validasi Face Anti Spoofing kegagalan/kelolosan.
+**Fokus Teknis:** Jika deteksi peladen server AI Python di baris backend Minifast v2 menyimpulkan verifikasi muka tersebut curang, nilai API bakal mengirim tag False. Klien HP menangkap intervensi format kembalian OS tag ini lalu UI mengkonversi menerbitkan antarmuka *Snackbar error rejection notification* kotak dialog bertulis "Wajah Bukan Manusia / Fake Liveness Detected Rejection". 
+
+### Rabu, 4 Maret 2026
+**Kegiatan:** Melangsungkan pengujian lapangan *Quality Assurance (QA) User* perangkat interaktif gawai lapangan (*Android Test Device*).
+**Fokus Teknis:** Eksekusi ujicoba pemindaian geofence radius dari sudut pojok lapangan, kemudian sengaja memutus putus sinyal perangkat kuota operator tipe paket internet lemah lemot *(Throttle Testing)*. Hal ditujukan untuk meneliti apabila ekosistem akan berujung me-*freeze/hang limit crash Out Of Server timeout*.
+
+### Kamis, 5 Maret 2026
+**Kegiatan:** Pemulihan kendala *Memory Leak* penumpukan kamera interaktif serta penerapan eksekusi pengulangan penagihan API logik otomatis.
+**Fokus Teknis:** RAM limit RAM OS dicegah meluap dengan senantiasa melakukan fungsi pelepasan siklus sumber kontroler `dispose camera sensor` setiap beralih halaman menu. Diintegrasikan tambahan kode retry di perantara network HTTP sehingga bilamana request terbuang asbab putus nyala paket data internet kustomer, form dapat mengantre kembali mengirim *request post data payload* otomatis. 
+
+### Jumat, 6 Maret 2026
+**Kegiatan:** Menciptakan manuver intervensi trigger menu tersembunyi `Triple-Click` eksklusif tablet operasional Kiosk.
+**Fokus Teknis:** Disembunyikan widget penangkap perabaan kontrol sentuh `<GestureDetector>` murni tak terlihat terhalang persis tertimbun di ikonik letak sudut *Logo Utama UI Kiosk Mode*. Sistem mengenali sekuen spesifik rutinitas ritmis: Menekan cepat berkala logo tap ketukan *sebanyak Tiga Kali berturutan presisi waktu miliseconds kaku jeli riel*, otomatis langsung platform menyembunyikan navigasi peramban Status Bar HP memahat berputar paksa utuh masuk rintangan ke `SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky) / Android Fullscreen Limit`. Pengguna dikunci pada perambanan absensi ini tiada dapat navigasi kabur *kembali/back* manipulatif paksa tutup ke beranda desktop antarmuka HP tablet OS. 
+
+### Sabtu, 7 Maret 2026
+**Kegiatan:** Pembuatan rupa *shape masking layer* ornamen pemandu pelurusan tata letak sudut potret proporsional sudut orientasi pandangan mata hidung kamera.
+**Fokus Teknis:** Dibangun lapisan bentuk pelapis form *Oval Overlay Clipping* yang berada pas mengatapi lapis jernih frame kamera lensa Preview HP Android. Berfungsi mengisyaratkan tata ruang sudut simetris area wajah panduan potret supaya pengguna meluruskan sudut *portrait face contour tracking titik sentral proporsi parameter* demi mempertinggi hasil kelincahan skor pengenalan konklusi model pendeteksi liveness engine backend mutakhir. 
+
+### Senin, 9 Maret 2026
+**Kegiatan:** Eksekusi optimalisasi file penertiban struktur repositori *Clean Code Cleanup File Structure*.
+**Fokus Teknis:** Rilis build yang berantakan direduksi size-nya. Memangkas seratusan elemen modul bereksperimen kepingan program fungsi tak terpakai riel usang mati terbengkela sisa sisa *(Dead code snippets).* Besaran file *Asset Grafis berkas statis Vector Image format SVG* diekspor konversi format dikompres ukurannya guna membikin kerangka spesifikasi *built .apk Application rilis* berberat dimensi ukuran instalasi storage memory gawai jauh lebih super mungil optimal ringan dipasang OS Android level standar murahan. 
+
+### Selasa, 10 Maret 2026
+**Kegiatan:** [*Fixing Bug Kalender Jadwal*] Membenahi logika inkonsistensi pertukaran kalender hari izin 'Day Off (DO)' mutlak Backend DB Sinkron Aplikasi Klien.
+**Fokus Teknis:** Menyelesaikan selisih sinkronisasi cacat laporan nilai ketidakhadiran berkedok kalender libur operasional jadwal kerja "DO". Pengujian berhasil memulihkan alir fungsi kalendar backend server ke aplikasi genggam agar rentang kalkulasi jam ketidakhadiran DO mingguan dibaca konsisten jernih stabil dan bukan disetel kecacatan kalkulasi hitung jam salah OS error. UI riwayat membaik.
+
+### Rabu, 11 Maret 2026
+**Kegiatan:** Penambahan rute intervensi API pengayaan khusus pengerjaan kebutuhan fungsi unggah sketsa grafis coretan konversi gurat `Canvas Base64 asali digital ttd Signature Supervisor.
+**Fokus Teknis:** Mendesain susunan panel fungsional arsitektur pengerat antarmuka tipe blok sentuh konversi coret sentuhan tangan di monitor gawai. Eksekusi ini merubah guratan logis peraba ujung layar jari menjadi rentetan wujud konversi pengarsipan string matriks representatif lukisan potret jenis format resolusi berwujud wujud `.PNG` format Base64 *encoding*. Modul mutlak dibenamkan difabrikasi perihal perlengkapan mutlak validasi surat wewenang tugas persetujuan persetujuan arsip dari perangkat hierarki OS superior akun berlevel mutlak Supervisor struktural jabatan logis perusahaan.
+
+### Kamis, 12 Maret 2026
+**Kegiatan:** [DESAIN IDENTITAS VISUAL MEREK LOGO APPS MAVEN RES TINGGI] Desain perombakan ulang wujud identitas paten penjenamaan arsitektur komersial aplikasi (Logo BKNOAapp MAVEN) bermutu piksel tinggi dan menutup revisi sistem UI fungsional spesifikasi konjungsi rincian hierarki admin persetujuan form file dokumen surat.
+**Fokus Teknis:** Dirancang alokasi spesifik meresolusi menyusun desain grafik properti pemformat ulang aset properti komersial gambar vektor mutakhir paten hak cipta visual merk Logo App (MAVEN OS LOGO). Dipastikan ekspor format komersial grafik wujud kanvas tipe gambar menembus kualitas resolusi tak retak batas format tak buram wujud format absolut HD PNG bersih asali format Launcher App Drawer Launcher peramban gawai UI OS utuh Android HP. Logo pun dibungkus diletakan persis merangkul batas sentral properti lingkaran berwujud lingkaran bulatan kontainer berbalut solid blok warna putihan. Skema warna ini dikhususkan agar desain warna gelap Logo menyala tampak tak samar bersinergi wujud padu padan elegan dengan properti blok UI geladak estetika nuansa hitam *layout geladak minimalis Mode Kiosk Gelap berpadu harmonis beriringan cantik serasi asali kontras.* Logika pelengkap level fungsi hierarki kontrol hirarki tuntas serentak dirapikan paripurna pada ujung hari ini juga utuh aman.
+
+### Jumat, 13 Maret 2026
+**Kegiatan:** [*Fixing Bug Protektor Instalasi OS*] Penanggulangan dan pembobolan atas hambatan perlakuan pemblokan peringatan merah rilis paket build Google Play Protect spesifikasi isolasi penangkal aplikasi instalasi paket di dalam HP OS asali Android internal OS uji coba Android kawan-kawan.
+**Fokus Teknis:** Proses spesimen uji *mentah (build raw .apk)* yang disebarkan kepada grup relawan dicegat instan oleh penjaga pintu internal benteng Android sandbox yakni tameng sistem OS OS *Google Play Protect alert rejection* yang menyebutnya perangkat lunak luar membahayakan entitas malnutrisi eksternal tidak aman tanpa identitas (*Untrusted Source developer unknown error blocked maleware fatal flag OS).* Solusi taktis dicapai sigap merombak pangkalan izin penanda kredibilitas pembuat aplikasi perusahaan ke level asali mutlak. Merangkai pendaftaran sandi kunci rilis penanda enkripsi perusahaan spesifk mengawinkan file tanda pendaftaran arsip asuransi rahasia pengembang file valid sertifikat identiti identiti root berpadanan fail: `key.jks / key store developer identity trust flag`. Kunci ini kemudian dilinkkan dikait di file rilis sistem fungsional instalatur ke parameter struktur file utuh mutlak android: properti baris sinkron basis ekosistem Gradle struktur: flag paten V2 Signature asali OS tipe (*v2SigningEnabled parameter bernilai boolean 'true'*). Masalah *alert OS blocked Play Protect OS utuh murni* sukses besar dijegal dan terselesaikan mutlak tak ada komplain kembali mulus sinkron terpasang utuh sempurna merdeka!. 
+
+### Sabtu, 14 Maret 2026
+**Kegiatan:** Penutupan pengerjaan tahapan persiapan pembentukan kerangka konfigurasi build properti modul paket berkas aplikasi gawai dan perumusan susunan baris Proguard pengabur ekosistem Android Native Obfuscation.
+**Fokus Teknis:** Hari ditutup menyisipkan susunan modul kode pengamanan pertahanan enkripsi. Konsep rilis paket dikesahkan mengusung konfigurasi pangkalan asali pengaman paten kode rahasia rilis berparameter file sandi sketsa rahasia rilis yakni skrip pengkabur arsitektur sistem kerangka file struktur ekosistem arsitektural Java ekosistem OS asali *Proguard Obfuscation Rilis Proteksi*. Memastikan arsitek tak dapat diekstrak atau dibongkar isinya via rekayasa reverse *engineer pembaca kelas struktur OS gawai* oknum hacker luaran dekstop utuh aman stabil mutlak rilis persiapannya kompilasi siap dilepas besok senin utuh asali mantap.
+
+### Senin, 16 Maret 2026
+**Kegiatan:** Eksekusi peluncuran spesifikasi arsitektur tahapan Build Release Alpha-Test .APK *Production Bundle Compile*.
+**Fokus Teknis:** Melaksanakan penarikan kompilasi peluncuran keluaran build utuh dengan format mutlak perintah OS Terminal eksekusi paten rilis: `flutter build apk --release --obfuscate --split-debug-info` murni asali Android Native SDK utuh. Proses berhasil mencetak berkas rilis perakitan akhir produksi asali paket perakitan (*Package APK Asali OS OS Production Size kecil gesit*). Bersamaan pula disebar distribusikan menyasar jajaran unit *tester asali mutlak kru operasional fungsi karyawan internal grup staf pengetesan lapangan spesimen OS testing stability Release Alpha-Test fase awal uji coba*. Berjalan tuntas optimal stabil tanpa ada fatal crash crash error sedikitpun sukses kelar tuntas asali mantap rilis Android rampung. 
+
+### Selasa, 17 Maret 2026
+**Kegiatan:** Rencana penyikapan platform migrasi kerangka adaptabilitas ekosistem kompilator murni transisi pergerakan OS ke target kompilasi lingkungan Apple iPhone native asali platform framework ekosistem dasar internal platform iOS iOS OS Mutlak murni Apple hardware.
+**Fokus Teknis:** Bersantai sejenak usai android tuntas, langkah proyek lanjut bersikeras mempersiapkan penataan adaptasi spesifikasi parameter library arsitektur internal kerangka konfigurasi ekosistem OS rilis asali dependensi perpustakaan fungsional asali bahasa rilis iOS Apple native *Objective-C / parameter spesifikasi perbendaharaan Apple Swift bahasa asli iOS OS*. Penyesuaian konfigurasi file setup perizinan pubspec dikesahkan disesuaikan menanti pembongkaran sinkron esok persiapan target kompilator hardware utuh mutlak.
+
+### Rabu, 18 Maret 2026
+**Kegiatan:** Injeksi paten tag otorisasi pengamanan modul file komponen perlengkapan privasi sentral rilis Apple (Manifest Data iOS Info.plist Target Info.plist) OS beserta pelarasan instalatur komponen modul dependensi kerangka instalatur Apple framework CocoaPods kompilator iOS bawaan native rilis mutlak.
+**Fokus Teknis:** Mengintegrasikan delegasi parameter penjamin tag komponen konfigurasi otoritas hak persetujuan permintaan akses komponen hardware pelacak pengguna asali OS Sandbox rilis Apple OS OS yakni menancapkan spesifikasi pembedahan asali hak akses sensor tangkapan potret Lensa Apple Kamera parameter:  `<key>NSCameraUsageDescription</key>`  dibuntuti rilis pendaftaran pelacak satelit radar mutlak asali Apple iOS parameter titik presisi sensor GPS tracker spesifikasi OS: `<key>NSLocationWhenInUseUsageDescription</key>` yang diunggah dicolok paten di modul pusat arsitektural privasi perizinan fungsional root direktori paten Apple `IOS/Runner/Info.plist parameter sandbox rilis iOS utuh aman`. Menyukseskan perampungan sinkron terminal command kompilator modul utilitas OS bawaan OS Apple spesifikasi parameter pemecah arsitektur rilis asali instruksi: `pod install` asali library file sinkron berhasil dirampungkan 100% tuntas bersyarat bersih tiada log error rilis mantap siap tes.
+
+### Kamis, 19 Maret 2026
+**Kegiatan:** [HARI KEMATIAN KEBUNTUAN BENCANA FATAL DEADLOCK] Gagalnya fasa ujung kerangka rilis target platform sistem akibat konfrontasi hambatan logis rilis arsitektur paten platform arsitektural tidak disediakannya satu pun fasilitas properti sarana operasional unit kerja yakni alat eksistensi ketiadaan komputer perangkat gawai sistem Mac OS PC iMac/Macbook. Proyek diputuskan *Crash Berhenti Mandek Total Disokong Liburan Tuntas Hangus!*.
+**Fokus Teknis:** **Ini merupakan kecelakaan logis tragedi kebuntuan hardware asali yang tak dicek awal!** Karena kebijakan konfigurasi manufaktur rilis eksklusif sistem properti Apple OS OS murni mengalihkan *syarat rilis ekosistem kompilator* rilis iOS app (*Native App SDK Flutter to Apple Binary IPA Release OS*) **mewajibkan sistemnya dirender dihidupkan memakai arsitektur paket perkakas program kompilator fungsional eksklusif penamaan perangkat peranti spesifikasi mutlak "Software Komputasi Developer XCode App Program Apple Mutlak"**. XCode App ini adalah penengah dewa kompilator render **HANYA bisa berjalan secara operasional fungsional OS beroperasi secara murni eksklusif diikat direkatkan paksa hanya ke arsitektur peranti kelas properti mesin sistem komputasi ber-titel *sistem operasi asali paten macOS Apple Hardware PC PC Mac berwadah laptop model gawai Macbook Pro eksklusif atau jajaran famili properti fisik perakitan mesin meja Apple layar Desktop PC iMac spesifik mutlak absolut ekosistem paten penjamin properti fisik mutlak OS murni***.
+Ketika realitanya di meja lingkungan asali infrastruktur meja kantor penampakan keseluruhan sarana inventaris ruangan perabotan di sini sama sekali tak berwawasan asali nihil total *tak memiliki satu buah sebijipun asali komputer mesin macOS mutlak tiada eksistensinya!* Hal ini memicu runtuhnya arsitektur proses *Build Native iOS eksekusi iOS flutter code sinkron OS tercekik logis*. Operasional ditangguhkan ditutup mati gembok. Seluruh proses dihentikan mendadak menyambut cuti panjang massal rutinitas pengerjaan asali di hari esoknya. Jeda kalendar total rehat dihentikan!.
+
+*(20 Maret 2026 s/d 29 Maret 2026: Aktivitas Pekerjaan Cuti Libur Nasional Proyek Pekerjaan Eksekusi Dihentikan Serempak Tutup Produksi Total)*
+
+---
+
+## FASE 4: Peralihan Strategis ke PWA iOS, Optimalisasi Pemindaian Wajah, dan Finalisasi
+
+### Senin, 30 Maret 2026
+**Kegiatan:** Pembuatan *Progressive Web App* (PWA) khusus iOS (BKNOAweb-ios) menggunakan React.JS dan Vite.
+**Fokus Teknis:** Menyikapi masalah tiadanya perangkat Mac untuk merilis aplikasi bawaan iPhone, proyek diubah haluannya dengan membuat alternatif berbasis web (PWA). Kerangka aplikasi ini dibangun menggunakan framework React dipadukan dengan Vite agar proses render lebih cepat. Desain antarmuka (UI) dikerjakan menggunakan Tailwind CSS dengan tujuan menyontek persis tampilan aplikasi Flutter sebelumnya. Selain itu, ditambahkan modifikasi ukuran margin (CSS `safe-area-inset-top`) agar desain bagian atas layar tidak terpotong oleh bentuk fisik *notch/Dynamic Island* pada iPhone. 
+
+### Selasa, 31 Maret 2026
+**Kegiatan:** Refactoring logika pemindaian wajah (*Face Scanning*) dari metode 5-Step menjadi 1-Step.
+**Fokus Teknis:** Mengoptimalkan fitur pemindaian wajah di aplikasi yang sebelumnya dikeluhkan berlajan lambat. Pada versi lama, pengguna diwajibkan mengikuti lima tahapan verifikasi gerakan (seperti menengok, tersenyum, berkedip, dll) yang memproses banyak memori sekaligus membebani CPU sistem secara berat. Algoritma ini dibongkar dan diganti menjadi verifikasi **1-Step Verification**. Lewat pembaruan ini, aplikasi hanya perlu menangkap satu lembar foto (frame drop snapshot) secara *real-time* dan langsung mentransfernya ke server Face API (Minifast v2) di backend. Proses validasi wajah berjalan instan tanpa menghilangkan akurasi deteksi pemalsuan, sehingga berhasil mengefisiensikan waktu antrean presensi karyawan yang sebelumnya memakan waktu sangat lama.
+
+### Rabu, 1 April 2026
+**Kegiatan:** Integrasi lensa WebRTC Safari, Proteksi Desktop Bypass, dan *Deployment* Akhir Proyek Keseluruhan.
+**Fokus Teknis:** Pada aplikasi PWA, akses pengaktifan perangkat keras kamera depan pengguna direalisasikan meggunakan API bawaan browser modern yang spesifik bernama *WebRTC (`navigator.mediaDevices.getUserMedia()`)* agar *video streaming* wajah masuk utuh di halaman web iPhone. 
+Sebagai perlindungan keamanan *geofencing* tambahan, skrip web ditambahkan perlindungan untuk mendeteksi pembatasan browser (User-Agent). Ini bertujuan menggagalkan karyawan yang secara curang mengakali web PWA menggunakan sambungan komputer dekstop PC/Laptop yang rentan dimanipulasi peretas ekstensi lokasi (*Fake GPS Chrome*). Proteksi tambahan ini dirancang untuk membatasi nilai rasio monitor ke batasan *Aspect Ratio* spesifik ukuran ponsel posisi tegap (Portrait 16:9). Jika PWA dibuka di layar lebar desktop, sistem akan menolak sinkronisasi dengan paksa dan layar tertutup secara fungsional.
+Di penghujung hari tanggal 1 April 2026, keseluruhan isi folder PWA hasil kompilasi (`/dist` pada React) segera didistribusikan (*deployment*) ke layanan server internal (Nginx). Dengan langkah ini, keseluruhan modul fungsional proyek BKNOA dikonfirmasi usai, dan sistem diserahkan ke manajemen untuk fase *User Acceptance Test* (UAT). Selesai.
